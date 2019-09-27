@@ -1,6 +1,7 @@
 ﻿Shader "Leon/ComputeVelocity" {
     Properties {
         _MainTex ("Texture", 2D) = "white" {}
+        _HeightMap ("HeightMap", 2D) = "white" {}
     }
     SubShader {
         Cull Off ZWrite Off ZTest Always
@@ -14,7 +15,7 @@
             #include "UnityCG.cginc"
             #include "Common.cginc"
 
-            sampler2D _MainTex, _Position;
+            sampler2D _MainTex, _Position, _HeightMap;
             float _NoiseScale, _TimeElapsed, _Curl, _Twirl, _Attract, _Gravity, _Expand, _Grain, _TimeDelta, _Friction;
 
             fixed4 frag (v2f_img i) : SV_Target {
@@ -32,7 +33,7 @@
                 float height = 100.;
                 float index = i.uv.x * width * height;
                 float2 uv = float2(fmod(index, width)/width,floor(index/width)/height)*2.0-1.0;
-                float3 p = float3(uv.x,0.,uv.y) * 4.0;
+                float3 p = float3(uv.x,tex2D(_HeightMap, uv*0.5+0.5).r,uv.y)*float3(4,2,4);
 
                 float3 attract = normalize(p-position) * smoothstep(0.0, 0.5, length(p-position));
                 float should = smoothstep(0.28,0.4,fmod(noise(seed)+_TimeElapsed*.1, 1.0));
