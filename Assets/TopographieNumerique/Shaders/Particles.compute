@@ -1,0 +1,66 @@
+﻿#pragma kernel compute
+#pragma kernel trail
+#include "Common.cginc"
+struct PointData { float3 position, velocity, info; };
+struct TrailData { float3 position, info; };
+uniform RWStructuredBuffer<PointData> _Particles;
+uniform RWStructuredBuffer<TrailData> _Trails;
+uniform float _TimeElapsed, _TimeDelta;
+uniform float _Count, _TrailSegment, _TrailDamping;
+uniform float _Speed, _Friction, _NoiseScale, _Curl, _Twirl, _Gravity, _Attract, _Expand, _Grain;
+uniform float4x4 _MatrixWorld, _MatrixLocal;
+
+[numthreads(8,1,1)]
+void compute (uint3 id : SV_DispatchThreadID) {
+	float3 position = _Particles[id.x].position;
+	float3 velocity = _Particles[id.x].velocity;
+	float3 info = _Particles[id.x].info;
+
+	float3 seed = position * _NoiseScale;
+	float3 curl = float3(noise(seed), noise(seed+float3(98.64,76.24,43.692)), noise(seed+float3(145.54,945.57,654.7485)))* 2.0 - 1.0;
+	float3 grain = float3(hash(seed.xz),hash(seed.yz),hash(seed.xy)) * 2.0 - 1.0;
+	float angle = atan2(position.z, position.x);
+	float3 twirl = float3(-sin(angle),0.0,cos(angle));
+	float3 gravity = float3(0,1,0);
+	float3 expand = normalize(position);
+	float width = 100.;
+	float height = 100.;
+	float2 uv = float2(fmod(id.x, width)/width,floor(id.x/width)/height)*2.0-1.0;
+	float3 p = float3(uv.x,0.,uv.y) * 4.0;
+
+	float3 attract = normalize(p-position) * smoothstep(0.0, 0.05, length(p-position));
+	float should = smoothstep(0.28,0.4,fmod(noise(seed)+_TimeElapsed*.1, 1.0));
+	float a = _TimeElapsed * .3;
+	float2 pp = float2(cos(a),sin(a))*.7;
+	should = smoothstep(0.1,0.0,length(uv-pp));
+	// should = pow(should, 5.);
+
+	velocity += (curl * _Curl + twirl * _Twirl + gravity * _Gravity + expand * _Expand + grain * _Grain) * should;
+	velocity += attract * _Attract * (1.-should);
+
+	velocity *= clamp(1.0 - _TimeDelta * _Friction, 0.0, 1.0);
+	position += velocity * _TimeDelta * _Speed;
+
+	// for (int i = 0; i < _TrailSegment; ++i) {
+	// 	_Trails[id.x*_TrailSegment+i].info = float3(respawn,0,0);
+	// }
+	// position = lerp(position, p, respawn);
+
+	_Particles[id.x].position = position;
+	_Particles[id.x].velocity = velocity;
+	_Particles[id.x].info = info;
+}
+
+
+[numthreads(8,1,1)]
+void trail (uint3 id : SV_DispatchThreadID) {
+	float3 position = _Trails[id.x].position;
+	float i = floor(id.x/_TrailSegment);
+	float it = floor(id.x*_TrailSegment)/_TrailSegment;
+	if (fmod(id.x, _TrailSegment) < 0.5 || _Trails[id.x].info.x > 0.5) {
+		position = _Particles[i].position;
+	} else {
+		position = lerp(position, _Trails[id.x-1].position, _TrailDamping);
+	}
+	_Trails[id.x].position = position;
+}
