@@ -13,13 +13,13 @@ MonoBehaviour:
   m_Name: Profile
   m_EditorClassIdentifier: 
   _Radius: 0.02
-  _Speed: 3.89
-  _Friction: 1.76
+  _Speed: 0.5
+  _Friction: 3
   _TrailDamping: 1
   _Curl: 0.61
   _Attract: 1
   _Twirl: 0.17
   _Gravity: 0
   _Expand: 0
-  _Grain: 0.17
+  _Grain: 0.04
   _NoiseScale: 6.71
