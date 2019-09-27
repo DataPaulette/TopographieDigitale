@@ -10,7 +10,7 @@ public class Particles : MonoBehaviour
 {
 	public int particleCount = 100000;
 	public int trailSegment = 10;
-	public Material material, materialPosition, materialVelocity, materialTrail;
+	public Material material, materialInit, materialPosition, materialVelocity, materialTrail;
 	public Profile profile;
 
 	private string[] uniformsProfile;
@@ -58,6 +58,13 @@ public class Particles : MonoBehaviour
 		// trailBuffer = new ComputeBuffer(trails.Length, Marshal.SizeOf(typeof(TrailData)));
 		// trailBuffer.SetData(trails);
 		// SetBuffer("_Trails", trailBuffer);
+
+		frameVelocity.Blit(materialInit);
+		framePosition.Blit(materialInit);
+		frameTrail.Blit(materialInit);
+		frameVelocity.Blit(materialInit);
+		framePosition.Blit(materialInit);
+		frameTrail.Blit(materialInit);
 	}
 
 	void Update ()
@@ -87,13 +94,13 @@ public class Particles : MonoBehaviour
 		for (int i = 0; i < profileFields.Length; ++i)
 			SetFloat(uniformsProfile[i], (float)profileFields[i].GetValue(profile));
 
-		frameVelocity.Blit(materialVelocity);
-		framePosition.Blit(materialPosition);
-		frameTrail.Blit(materialTrail);
-
 		SetTexture("_Velocity", frameVelocity.GetTexture());
 		SetTexture("_Position", framePosition.GetTexture());
 		SetTexture("_Trail", frameTrail.GetTexture());
+
+		frameVelocity.Blit(materialVelocity);
+		framePosition.Blit(materialPosition);
+		frameTrail.Blit(materialTrail);
 
 		// compute.Dispatch(0, particles.Length/8, 1, 1);
 		// compute.Dispatch(1, trails.Length/8, 1, 1);

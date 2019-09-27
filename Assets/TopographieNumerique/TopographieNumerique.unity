@@ -191,10 +191,10 @@ MonoBehaviour:
   particleCount: 10000
   trailSegment: 10
   material: {fileID: 2100000, guid: 55674f14d2d298b45b0ac032419345ce, type: 2}
+  materialInit: {fileID: 2100000, guid: e9bc2977f42f3f344b035aff3a862b17, type: 2}
   materialPosition: {fileID: 2100000, guid: d7d76db8182f38740b6c9b3e00a8cccc, type: 2}
   materialVelocity: {fileID: 2100000, guid: 09c7c0977b2da07428ed3592b269e68d, type: 2}
   materialTrail: {fileID: 2100000, guid: 7898eb9569152804e8541f2b71fddb20, type: 2}
-  compute: {fileID: 4800000, guid: ecf787c44ec615d47bd7fb940b510104, type: 3}
   profile: {fileID: 11400000, guid: 9459f20ab5a825d4bb68aac501588349, type: 2}
 --- !u!4 &677315359
 Transform:

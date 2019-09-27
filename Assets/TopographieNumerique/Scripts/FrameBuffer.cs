@@ -11,6 +11,7 @@ public class FrameBuffer
 		frames = new RenderTexture[count];
 		for (int i = 0; i < count; ++i) {
 			frames[i] = new RenderTexture(width, height, depth, format, readwrite);
+			frames[i].Create();
 		}
 	}
 
