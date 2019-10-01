@@ -12,16 +12,12 @@ public class Particles : MonoBehaviour
 	public int trailSegment = 10;
 	public Material material, materialInit, materialPosition, materialVelocity, materialTrail;
 	public Profile profile;
+	public Texture heightMap;
 
 	private string[] uniformsProfile;
 	private FieldInfo[] profileFields;
-
+	private int dimension;
 	private FrameBuffer framePosition, frameVelocity, frameTrail;
-	// private struct PointData { public Vector3 position, velocity, info; }
-	// private struct TrailData { public Vector3 position, info; }
-	// private PointData[] particles;
-	// private TrailData[] trails;
-	// private ComputeBuffer particleBuffer, trailBuffer;
 
 	void Start ()
 	{
@@ -37,27 +33,7 @@ public class Particles : MonoBehaviour
 		frameVelocity = new FrameBuffer(2, particleCount, 1, 24, RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Linear);
 		frameTrail = new FrameBuffer(2, particleCount, trailSegment, 24, RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Linear);
 
-		// particles = new PointData[particleCount];
-		// for (int i = 0; i < particleCount; ++i) {
-		// 	particles[i].position = VectorRange(-1f,1f);
-		// 	particles[i].velocity = Vector3.zero;
-		// 	particles[i].info = Vector3.zero;
-		// }
-		// trails = new TrailData[particleCount*trailSegment];
-		// for (int i = 0; i < particleCount; ++i) {
-		// 	for (int t = 0; t < trailSegment; ++t) {
-		// 		trails[i*trailSegment+t].position = particles[i].position;
-		// 		trails[i*trailSegment+t].info = Vector3.zero;
-		// 	}
-		// }
-
-		// particleBuffer = new ComputeBuffer(particles.Length, Marshal.SizeOf(typeof(PointData)));
-		// particleBuffer.SetData(particles);
-		// SetBuffer("_Particles", particleBuffer);
-
-		// trailBuffer = new ComputeBuffer(trails.Length, Marshal.SizeOf(typeof(TrailData)));
-		// trailBuffer.SetData(trails);
-		// SetBuffer("_Trails", trailBuffer);
+		dimension = (int)Mathf.Pow(2f, Mathf.Ceil(Mathf.Log(Mathf.Sqrt(particleCount)) / Mathf.Log(2f)));
 
 		frameVelocity.Blit(materialInit);
 		framePosition.Blit(materialInit);
@@ -69,41 +45,23 @@ public class Particles : MonoBehaviour
 
 	void Update ()
 	{
-		// if (Input.GetKeyDown(KeyCode.R)) {
-		// 	Vector3[] vertices = gameObject.GetComponent<MeshFilter>().mesh.vertices;
-		// 	for (int i = 0; i < particleCount; ++i) {
-		// 		particles[i].position = vertices[i];
-		// 		particles[i].velocity = Vector3.zero;
-		// 	}
-		// 	particleBuffer.SetData(particles);
-		// }
-
+		for (int i = 0; i < profileFields.Length; ++i)
+			SetFloat(uniformsProfile[i], (float)profileFields[i].GetValue(profile));
 		SetFloat("_Count", particleCount);
 		SetFloat("_TrailSegment", trailSegment);
 		SetFloat("_TimeElapsed", Time.time);
+		SetFloat("_Dimension", dimension);
 		SetFloat("_TimeDelta", Time.deltaTime);
 		SetMatrix("_MatrixWorld", transform.localToWorldMatrix);
 		SetMatrix("_MatrixLocal", transform.worldToLocalMatrix);
-
-
-		// #if UNITY_EDITOR
-		// SetBuffer("_Particles", particleBuffer);
-		// SetBuffer("_Trails", trailBuffer);
-		// #endif
-
-		for (int i = 0; i < profileFields.Length; ++i)
-			SetFloat(uniformsProfile[i], (float)profileFields[i].GetValue(profile));
-
 		SetTexture("_Velocity", frameVelocity.GetTexture());
 		SetTexture("_Position", framePosition.GetTexture());
 		SetTexture("_Trail", frameTrail.GetTexture());
+		SetTexture("_HeightMap", heightMap);
 
 		frameVelocity.Blit(materialVelocity);
 		framePosition.Blit(materialPosition);
 		frameTrail.Blit(materialTrail);
-
-		// compute.Dispatch(0, particles.Length/8, 1, 1);
-		// compute.Dispatch(1, trails.Length/8, 1, 1);
 	}
 
 	void SetVector(string name, Vector3 v) {
@@ -134,18 +92,7 @@ public class Particles : MonoBehaviour
 		materialTrail.SetMatrix(name, v);
 	}
 
-	// void SetBuffer(string name, ComputeBuffer v) {
-	// 	material.SetBuffer(name, v);
-	// 	if (v != null) compute.SetBuffer(0, name, v);
-	// 	if (v != null) compute.SetBuffer(1, name, v);
-	// }
-
 	Vector3 VectorRange (float min, float max) {
 		return new Vector3(UnityEngine.Random.Range(min,max), UnityEngine.Random.Range(min,max), UnityEngine.Random.Range(min,max));
 	}
-
-	// void OnDestroy () {
-	// 	if (particleBuffer != null) particleBuffer.Dispose();
-	// 	if (trailBuffer != null) trailBuffer.Dispose();
-	// }
 }

@@ -189,13 +189,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   particleCount: 4095
-  trailSegment: 10
+  trailSegment: 3
   material: {fileID: 2100000, guid: 55674f14d2d298b45b0ac032419345ce, type: 2}
   materialInit: {fileID: 2100000, guid: e9bc2977f42f3f344b035aff3a862b17, type: 2}
   materialPosition: {fileID: 2100000, guid: d7d76db8182f38740b6c9b3e00a8cccc, type: 2}
   materialVelocity: {fileID: 2100000, guid: 09c7c0977b2da07428ed3592b269e68d, type: 2}
   materialTrail: {fileID: 2100000, guid: 7898eb9569152804e8541f2b71fddb20, type: 2}
   profile: {fileID: 11400000, guid: 9459f20ab5a825d4bb68aac501588349, type: 2}
+  heightMap: {fileID: 2800000, guid: 143c9876d5327d24ebf7d17b2687605f, type: 3}
 --- !u!4 &677315359
 Transform:
   m_ObjectHideFlags: 0
@@ -288,8 +289,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1246714529}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: -10}
+  m_LocalRotation: {x: -0.44861943, y: -0.016892087, z: 0.008481155, w: -0.89352304}
+  m_LocalPosition: {x: -0.06165371, y: 7.017605, z: -5.3556128}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -302,7 +303,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1246714529}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 79fde04d3279f1741b6680524b045e15, type: 3}
   m_Name: 

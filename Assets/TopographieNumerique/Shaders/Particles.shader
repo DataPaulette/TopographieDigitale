@@ -23,48 +23,41 @@
 			float4 color : TEXCOORD2;
 		};
 
-		sampler2D _Position, _Trail;
-		float _Radius, _Emissive, _TrailSegment, _TimeElapsed, _Metallic, _Glossiness;
+		sampler2D _Velocity, _Position, _Trail, _HeightMap;
+		float _Radius, _Emissive, _TrailSegment, _TimeElapsed, _Metallic, _Glossiness, _Dimension, _Height, _HeightVariation, _WindNoiseScale, _WindStrength, _WindSpeed;
 		float4x4 _MatrixWorld;
 
 		void vert (inout appdata_full v, out Input o)
 		{
 			UNITY_INITIALIZE_OUTPUT(Input, o);
 			float3 p = v.vertex.xyz;
-			o.color = float4(1,1,1,1);
+			float3 velocity = tex2Dlod(_Velocity, float4(v.texcoord1.x,0,0,0)).xyz;
+			float moving = smoothstep(0.0, 0.1, length(velocity));
+			float notMoving = 1.-moving;
 
-			// #ifdef SHADER_API_D3D11
-			// float index = v.texcoord1.y*_TrailSegment;
-			// index += floor(clamp(v.texcoord.y*0.5+0.5,0,1) * (_TrailSegment-1));
-			// PointData particle = _Particles[v.texcoord1.y];
-			// p = _Trails[index].position;
-			// o.color = float4(particle.info, 1);
-			o.color = float4(1,1,1,1);
-			// float moving = length(_Particles[v.texcoord1.y].velocity);
-			// float yes = smoothstep(0.5,0.1,moving);
-			// v.normal = normalize(cross(float3(0,1,0),_Trails[index+1].position-_Trails[index].position));
-			// v.normal = lerp(v.normal, normalize(cross(float3(0,1,0),_Particles[v.texcoord1.y].velocity)), 1.-yes);
-			// float height = 0.4 + 1.4 * noise(p*20.);
-			// float y = v.texcoord.y * 0.5 + 0.5;
-			// p += float3(0,1,0) * yes * y * height;
-			// float a = noise(p*10.) + _TimeElapsed;
-			// p.xz += float2(cos(a),sin(a)) * sin(v.texcoord.y) * .1 * yes * y;
-			// p += float3(1,0,0) * yes * v.texcoord.x * 0.1*(1.-y);
-			// o.color *= lerp(1,y,yes);
-			// p -= float3(0,1,0) * _Radius * v.texcoord.x * (1.-yes);
-			// #endif
-
-			// p = tex2Dlod(_Position, float4(v.texcoord1.x,0,0,0)).xyz;
 			float yy = v.texcoord.y * 0.5 + 0.5;
 			p = tex2Dlod(_Trail, float4(v.texcoord1.x,yy,0,0)).xyz;
+			float e = 0.01;
+			float index = v.texcoord1.y;
+      float4 uv = clamp(float4(fmod(index, _Dimension)/_Dimension,floor(index/_Dimension)/_Dimension,0,0),0.,1.);
+			float3 north = float3(uv.x,tex2Dlod(_HeightMap, uv).r,uv.y+e);
+			float3 south = float3(uv.x,tex2Dlod(_HeightMap, uv).r,uv.y-e);
+			float3 east = float3(uv.x+e,tex2Dlod(_HeightMap, uv).r,uv.y);
+			float3 west = float3(uv.x-e,tex2Dlod(_HeightMap, uv).r,uv.y);
+			v.normal = cross(normalize(north-south), normalize(east-west));
+
+			p.y += yy * (_Height + _HeightVariation * hash(uv.xy)) * notMoving;
+			float a = noise(p * _WindNoiseScale) * PI * 2 +  _WindSpeed * _TimeElapsed;
+			p.xz += float2(cos(a),sin(a))*yy*_WindStrength * notMoving;
 
 			// billboard
-			float3 z = normalize(_WorldSpaceCameraPos - p);
+			float3 z = -normalize(_WorldSpaceCameraPos - p);
 			float3 x = normalize(cross(z, float3(0,1,0)));
 			float3 y = normalize(cross(x, z));
-			p += (x * v.texcoord.x - y * v.texcoord.y) *  _Radius;
-			v.vertex.xyz = p;//mul(unity_WorldToObject, float4(p,1)).xyz;
+			p += (x * v.texcoord.x * (1.-yy) + y * v.texcoord.y) * (_Radius + moving*.01);
+			v.vertex.xyz = p;
 			o.texcoord = v.texcoord;
+			o.color = float4(1,1,1,1)*yy;
 		}
 
 		void surf (Input IN, inout SurfaceOutputStandard o)

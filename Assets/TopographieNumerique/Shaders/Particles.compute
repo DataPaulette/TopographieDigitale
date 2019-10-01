@@ -60,7 +60,7 @@ void trail (uint3 id : SV_DispatchThreadID) {
 	if (fmod(id.x, _TrailSegment) < 0.5 || _Trails[id.x].info.x > 0.5) {
 		position = _Particles[i].position;
 	} else {
-		position = lerp(position, _Trails[id.x-1].position, _TrailDamping);
+		position = lerp(_Trails[id.x-1].position, position, _TrailDamping);
 	}
 	_Trails[id.x].position = position;
 }

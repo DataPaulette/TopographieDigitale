@@ -12,14 +12,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ace69c9260526084bb4b430f3ca09d09, type: 3}
   m_Name: Profile
   m_EditorClassIdentifier: 
-  _Radius: 0.02
-  _Speed: 0.5
+  _Radius: 0.005
+  _Height: 0.17
+  _HeightVariation: 0.51
+  _WindNoiseScale: 1
+  _WindStrength: 0.15
+  _WindSpeed: 1
+  _Speed: 1
   _Friction: 3
-  _TrailDamping: 1
-  _Curl: 0.61
+  _TrailDamping: 0.19
+  _Curl: 0.95
   _Attract: 1
-  _Twirl: 0.17
-  _Gravity: 0
+  _Twirl: 0.08
+  _Gravity: 0.05
   _Expand: 0
-  _Grain: 0.04
-  _NoiseScale: 6.71
+  _Grain: 0.31
+  _NoiseScale: 3

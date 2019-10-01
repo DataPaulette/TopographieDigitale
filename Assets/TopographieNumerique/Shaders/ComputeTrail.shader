@@ -20,8 +20,11 @@
                 float3 trail = tex2D(_MainTex, i.uv).xyz;
                 float3 previous = tex2D(_MainTex, i.uv-float2(0,1./_TrailSegment)).xyz;
                 float3 position = tex2D(_Position, i.uv).xyz;
-                trail = position;
-                trail = lerp(trail, previous, _TrailDamping * step(1./_TrailSegment,i.uv.y));
+                if (i.uv.y * _TrailSegment < 1.0) {
+                    trail = position;
+                } else {
+                    trail = lerp(trail, previous, _TrailDamping);
+                }
                 return float4(trail,0);
             }
             ENDCG
