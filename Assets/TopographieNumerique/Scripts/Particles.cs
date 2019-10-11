@@ -5,7 +5,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using UnityEngine;
-using Uduino;
 
 public class Particles : MonoBehaviour
 {
@@ -42,9 +41,6 @@ public class Particles : MonoBehaviour
 		frameVelocity.Blit(materialInit);
 		framePosition.Blit(materialInit);
 		frameTrail.Blit(materialInit);
-
-		UduinoManager.Instance.OnDataReceived += OnDataReceived; //Create the Delegate
-		UduinoManager.Instance.alwaysRead = true; // This value should be On By Default
 	}
 
 	void Update ()
@@ -66,13 +62,6 @@ public class Particles : MonoBehaviour
 		frameVelocity.Blit(materialVelocity);
 		framePosition.Blit(materialPosition);
 		frameTrail.Blit(materialTrail);
-	}
-
-
-	void OnDataReceived(string data, UduinoDevice deviceName)
-	{
-		Debug.Log(data);
-		Debug.Log(deviceName);
 	}
 
 	void SetVector(string name, Vector3 v) {

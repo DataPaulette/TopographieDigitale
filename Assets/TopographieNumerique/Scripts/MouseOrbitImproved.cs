@@ -25,6 +25,7 @@ public class MouseOrbitImproved : MonoBehaviour
 
 	void Start () 
 	{
+		Cursor.visible = false;
 		if (target == null) {
 			GameObject t = new GameObject("Camera Target");
 			target = t.transform;
